@@ -21,7 +21,7 @@ int servo_A3_position = 90;  // Start in the 90 degree position (center)
 int servo_A6_position = 96;  // Start in the 96 degree position (jaws closed)
 
 const int arduino_button = 4;  // the number of the pushbutton pin
-
+const int laser_pointer = 10;
 bool PLAYER = true;
 
 enum Program {
@@ -52,6 +52,9 @@ void setup() {
   // initialize the pushbutton pin as an input:
   pinMode(arduino_button, INPUT);
 
+  pinMode(laser_pointer, OUTPUT); // Set D10 as an OUTPUT
+
+
   // initialize the display
   attachDisplay();
 
@@ -72,7 +75,7 @@ void loop() {
       laserPointerLoop();
       break;
     case 3:
-      printText("Cat Toy()");
+      catToyLoop();
       break;
     case 4:
       printText("Dance Demo()");
@@ -180,17 +183,41 @@ void passBluntLoop() {
 }
 
 void laserPointerLoop() {
-  servo_A0_position = map(analogRead(0), 0, 1023, 0, 180);
-  servo_A0.write(servo_A0_position);
-  servo_A1_position = map(analogRead(1), 0, 1023, 0, 180);
-  servo_A1.write(servo_A1_position);
-  servo_A2_position = map(analogRead(2), 0, 1023, 0, 180);
-  servo_A2.write(servo_A2_position);
-  servo_A3_position = map(analogRead(3), 0, 1023, 0, 180);
-  servo_A3.write(servo_A3_position);
-  servo_A6_position = map(analogRead(6), 0, 1023, 35, 90);
-  servo_A6.write(servo_A6_position);
-  displayServoPositions();
+  bool on = true;
+  digitalWrite(laser_pointer, HIGH);
+  while (true) {
+    if (on) {
+      digitalWrite(laser_pointer, HIGH);
+    } else {
+      digitalWrite(laser_pointer, LOW);
+    }
+
+    if (digitalRead(arduino_button) == LOW) {
+        on = !on;
+    }
+    servo_A0_position = map(analogRead(0), 0, 1023, 0, 180);
+    servo_A0.write(servo_A0_position);
+    servo_A1_position = map(analogRead(1), 0, 1023, 0, 180);
+    servo_A1.write(servo_A1_position);
+    servo_A2_position = map(analogRead(2), 0, 1023, 0, 180);
+    servo_A2.write(servo_A2_position);
+    servo_A3_position = map(analogRead(3), 0, 1023, 0, 180);
+    servo_A3.write(servo_A3_position);
+    servo_A6_position = map(analogRead(6), 0, 1023, 35, 90);
+    servo_A6.write(servo_A6_position);
+    displayServoPositions();
+  }
+
+}
+
+void catToyLoop() {
+  printText("Cat Toy Program");
+  while (true) {
+    digitalWrite(laser_pointer, HIGH); // Turn the LED on
+    delay(1000);            // Wait for a second
+    digitalWrite(laser_pointer, LOW);  // Turn the LED off
+    delay(1000);            // Wait for a second
+  }
 }
 
 
